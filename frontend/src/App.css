@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+:root {
+  --color-background: #fdfdfd;
+  --color-text: #111;
+}
+
+[data-theme='dark'] {
+  --color-background: #121212;
+  --color-text: #e0e0e0;
+}
