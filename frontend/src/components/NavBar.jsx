@@ -5,44 +5,75 @@ const NavBar = () => {
     marginRight: '1.5rem',
     color: '#fff',
     textDecoration: 'none',
+    transition: 'color 0.3s ease',  // Added transition for smooth color change
+  };
+
+  const activeStyle = {
+    fontWeight: 'bold',
+    textDecoration: 'underline',
   };
 
   return (
-    <nav style={{ padding: '1rem', background: '#222' }}>
+    <nav
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        backgroundColor: '#1a1a1a',
+        padding: '1rem 2rem',
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+        backdropFilter: 'blur(4px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
       <NavLink
         to="/"
-        style={linkStyle}
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
         end
-        // Check if the link is active, and apply active styles
-        className={({ isActive }) => (isActive ? 'active' : '')}
       >
         Home
       </NavLink>
       <NavLink
         to="/game"
-        style={linkStyle}
-        className={({ isActive }) => (isActive ? 'active' : '')}
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
       >
         Game
       </NavLink>
       <NavLink
         to="/leaderboard"
-        style={linkStyle}
-        className={({ isActive }) => (isActive ? 'active' : '')}
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
       >
         Leaderboard
       </NavLink>
       <NavLink
         to="/gamecontents"
-        style={linkStyle}
-        className={({ isActive }) => (isActive ? 'active' : '')}
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
       >
         Game Contents
       </NavLink>
       <NavLink
         to="/teamintro"
-        style={linkStyle}
-        className={({ isActive }) => (isActive ? 'active' : '')}
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
       >
         Team Intro
       </NavLink>
