@@ -5,7 +5,7 @@ const NavBar = () => {
     marginRight: '1.5rem',
     color: '#fff',
     textDecoration: 'none',
-    transition: 'color 0.3s ease',  // Added transition for smooth color change
+    transition: 'color 0.3s ease', // Added transition for smooth color change
   };
 
   const activeStyle = {
@@ -81,4 +81,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default NavBar
