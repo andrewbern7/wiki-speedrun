@@ -1,9 +1,29 @@
+import React, { useEffect, useState } from "react";
 import { useTheme } from "../components/ThemeContext";
-
 
 const LeaderboardPage = () => {
   const { theme } = useTheme();
+  const [leaderboard, setLeaderboard] = useState([]);
   const isDark = theme === 'dark';
+
+  useEffect(() => {
+    console.log('[LeaderboardPage] Component mounted. Theme:', theme, 'isDark:', isDark);
+    console.log('[LeaderboardPage] Fetching leaderboard from /api/leaderboard...');
+    fetch('/api/leaderboard')
+      .then(response => {
+        console.log('[LeaderboardPage] Received response status:', response.status);
+        return response.json();
+      })
+      .then(data => {
+        console.log('[LeaderboardPage] Response JSON:', data);
+        const entries = data.leaderboard || [];
+        console.log('[LeaderboardPage] Parsed leaderboard entries:', entries);
+        setLeaderboard(entries);
+      })
+      .catch(error => {
+        console.error('[LeaderboardPage] Error fetching leaderboard:', error);
+      });
+  }, [theme, isDark]);
 
   const pageStyles = {
     minHeight: '100vh',
@@ -55,9 +75,7 @@ const LeaderboardPage = () => {
       <style>
         {`
           tr:hover {
-            background-color: ${
-              isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(219, 234, 254, 0.5)'
-            };
+            background-color: ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(219, 234, 254, 0.5)'};
             transition: background-color 0.2s ease;
           }
         `}
@@ -69,52 +87,26 @@ const LeaderboardPage = () => {
             <th style={cellStyle}>#</th>
             <th style={cellStyle}>Player</th>
             <th style={cellStyle}>Fastest Time</th>
-            <th style={cellStyle}>Fastest Click</th>
-            <th style={cellStyle}>Recent Runs</th>
-            <th style={cellStyle}>Fewest Clicks</th>
+            <th style={cellStyle}>Clicks</th>
           </tr>
         </thead>
         <tbody>
-          <tr style={{ backgroundColor: 'transparent' }}>
-            <td style={cellStyle}>01</td>
-            <td style={cellStyle}>Alice</td>
-            <td style={cellStyle}>1:23</td>
-            <td style={cellStyle}>4</td>
-            <td style={cellStyle}>6</td>
-            <td style={cellStyle}>3</td>
-          </tr>
-          <tr style={{ backgroundColor: 'transparent' }}>
-            <td style={cellStyle}>02</td>
-            <td style={cellStyle}>Bob</td>
-            <td style={cellStyle}>1:45</td>
-            <td style={cellStyle}>5</td>
-            <td style={cellStyle}>5</td>
-            <td style={cellStyle}>4</td>
-          </tr>
-          <tr style={{ backgroundColor: 'transparent' }}>
-            <td style={cellStyle}>03</td>
-            <td style={cellStyle}>Charlie</td>
-            <td style={cellStyle}>2:01</td>
-            <td style={cellStyle}>6</td>
-            <td style={cellStyle}>8</td>
-            <td style={cellStyle}>4</td>
-          </tr>
-          <tr style={{ backgroundColor: 'transparent' }}>
-            <td style={cellStyle}>04</td>
-            <td style={cellStyle}>Dana</td>
-            <td style={cellStyle}>2:20</td>
-            <td style={cellStyle}>7</td>
-            <td style={cellStyle}>9</td>
-            <td style={cellStyle}>6</td>
-          </tr>
-          <tr style={{ backgroundColor: 'transparent' }}>
-            <td style={cellStyle}>05</td>
-            <td style={cellStyle}>Eli</td>
-            <td style={cellStyle}>2:45</td>
-            <td style={cellStyle}>8</td>
-            <td style={cellStyle}>7</td>
-            <td style={cellStyle}>5</td>
-          </tr>
+          {leaderboard.length > 0 ? (
+            leaderboard.map((entry, index) => (
+              <tr key={entry.id} style={{ backgroundColor: 'transparent' }}>
+                <td style={cellStyle}>{index + 1}</td>
+                <td style={cellStyle}>{entry.name}</td>
+                <td style={cellStyle}>{entry.time}</td>
+                <td style={cellStyle}>{entry.clicks}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td style={cellStyle} colSpan="4">
+                No leaderboard data available. Be the first to set a record!
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
