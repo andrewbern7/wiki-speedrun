@@ -17,7 +17,7 @@ const getRandomArticle = async () => {
     'https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0&origin=*'
   )
   const data = await res.json()
-  return (data.query?.random?.[0]?.title || 'Elon_Musk').replace(/ /g, '_')
+  return (data.query?.random?.[0]?.title || 'United States of America').replace(/ /g, '_')
 }
 
 // format ms to MM:SS
@@ -157,20 +157,10 @@ const GamePage = () => {
       <div style={{ padding: '2rem', textAlign: 'center' }}>
         <button onClick={initGame} style={{
           ...commonBtn,
-          background: isDark ? '#2f855a' : '#48bb78',
-          animation: 'pulse 1.5s infinite',
-          cursor: 'pointer'
+          background: isDark ? '#2f855a' : '#48bb78'
         }}>
           Start Game
         </button>
-        {/* Add the pulse animation to be available before game starts */}
-        <style>{`
-          @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
-          }
-        `}</style>
       </div>
     )
   }

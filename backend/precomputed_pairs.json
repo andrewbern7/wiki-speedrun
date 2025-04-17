@@ -1,0 +1,96 @@
+[
+    {
+        "start": "Albert_Einstein",
+        "goal": "Physics",
+        "distance": 1,
+        "path": [
+            "Albert_Einstein",
+            "Physics"
+        ]
+    },
+    {
+        "start": "New_York_City",
+        "goal": "United_States",
+        "distance": 1,
+        "path": [
+            "New_York_City",
+            "United_States"
+        ]
+    },
+    {
+        "start": "World_War_II",
+        "goal": "Adolf_Hitler",
+        "distance": 1,
+        "path": [
+            "World_War_II",
+            "Adolf_Hitler"
+        ]
+    },
+    {
+        "start": "Python_(programming_language)",
+        "goal": "Programming_language",
+        "distance": 1,
+        "path": [
+            "Python_(programming_language)",
+            "Programming_language"
+        ]
+    },
+    {
+        "start": "Basketball",
+        "goal": "Sport",
+        "distance": 1,
+        "path": [
+            "Basketball",
+            "Sport"
+        ]
+    },
+    {
+        "start": "Industrial_Revolution",
+        "goal": "Steam_engine",
+        "distance": 1,
+        "path": [
+            "Industrial_Revolution",
+            "Steam_engine"
+        ]
+    },
+    {
+        "start": "Sparta",
+        "goal": "Thermopylae",
+        "distance": 2,
+        "path": [
+            "Sparta",
+            "Battle_of_Thermopylae",
+            "Thermopylae"
+        ]
+    },
+    {
+        "start": "Minecraft",
+        "goal": "Ender_Dragon",
+        "distance": 2,
+        "path": [
+            "Minecraft",
+            "Lego_Minecraft",
+            "Ender_Dragon"
+        ]
+    },
+    {
+        "start": "Moore's_Law",
+        "goal": "Transistor",
+        "distance": 2,
+        "path": [
+            "Moore's_Law",
+            "Moore's_law",
+            "Transistor"
+        ]
+    },
+    {
+        "start": "The_Witcher",
+        "goal": "Galahad",
+        "distance": 2,
+        "path": [
+            "The_Witcher",
+            "List_of_characters_in_The_Witcher_series",
+            "Galahad"
+        ]
+    }
+]
