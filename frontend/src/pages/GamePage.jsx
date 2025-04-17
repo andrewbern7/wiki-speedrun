@@ -96,6 +96,38 @@ const GamePage = () => {
 
   const articleTitle = history[currentIndex]
 
+  // check if user reached goal page
+  useEffect(() => {
+    if (!gameStarted || paused) return;
+
+    if (articleTitle === goalTitle) {
+      setPaused(true); // stop timer
+      const timeTaken = Date.now() - startTime - accumPaused;
+
+      const playerName = prompt("🎉 You reached the goal!\nEnter your name for the leaderboard:");
+
+      if (playerName) {
+        fetch('/api/submit-challenge-run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            start: history[0],
+            goal: goalTitle,
+            player_name: playerName,
+            time_ms: timeTaken,
+            clicks: clicks
+          })
+        }).then(() => {
+          alert(`✅ Score submitted!\nTime: ${formatTime(timeTaken)}, Clicks: ${clicks}`);
+          handleEndGame();
+        });
+      } else {
+        alert("❌ Score not submitted. No name entered.");
+        handleEndGame();
+      }
+    }
+  }, [articleTitle, goalTitle, gameStarted])
+
   // navigation handlers count clicks
   const handleNavigate = next => {
     if (paused) return
