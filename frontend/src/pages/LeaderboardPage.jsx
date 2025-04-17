@@ -4,26 +4,25 @@ import { useTheme } from "../components/ThemeContext";
 const LeaderboardPage = () => {
   const { theme } = useTheme();
   const [leaderboard, setLeaderboard] = useState([]);
+  const [challenges, setChallenges] = useState([]);
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
   const isDark = theme === 'dark';
 
+  // Fetch precomputed challenge options
   useEffect(() => {
-    console.log('[LeaderboardPage] Component mounted. Theme:', theme, 'isDark:', isDark);
-    console.log('[LeaderboardPage] Fetching leaderboard from /api/leaderboard...');
-    fetch('/api/leaderboard')
-      .then(response => {
-        console.log('[LeaderboardPage] Received response status:', response.status);
-        return response.json();
-      })
-      .then(data => {
-        console.log('[LeaderboardPage] Response JSON:', data);
-        const entries = data.leaderboard || [];
-        console.log('[LeaderboardPage] Parsed leaderboard entries:', entries);
-        setLeaderboard(entries);
-      })
-      .catch(error => {
-        console.error('[LeaderboardPage] Error fetching leaderboard:', error);
-      });
-  }, [theme, isDark]);
+    fetch('/api/get-precomputed-pairs')
+      .then(res => res.json())
+      .then(data => setChallenges(data))
+  }, [])
+
+  // Fetch leaderboard data for selected challenge
+  useEffect(() => {
+    if (!selectedChallenge) return
+    const { start, goal } = selectedChallenge
+    fetch(`/api/top-runs/${start}/${goal}`)
+      .then(res => res.json())
+      .then(data => setLeaderboard(data))
+  }, [selectedChallenge])
 
   const pageStyles = {
     minHeight: '100vh',
@@ -72,6 +71,25 @@ const LeaderboardPage = () => {
     <div style={pageStyles}>
       <h1 style={headerStyles}>Leaderboard</h1>
 
+      {/* Dropdown selector for challenges */}
+      <div style={{ marginBottom: '2rem' }}>
+        <select
+          onChange={e => {
+            const index = e.target.value;
+            setSelectedChallenge(challenges[index]);
+          }}
+          defaultValue=""
+          style={{ padding: '0.75rem', fontSize: '1.1rem', borderRadius: '6px' }}
+        >
+          <option value="" disabled>Select a challenge</option>
+          {challenges.map((c, i) => (
+            <option key={i} value={i}>
+              {c.start.replace(/_/g, ' ')} → {c.goal.replace(/_/g, ' ')} ({c.distance} clicks)
+            </option>
+          ))}
+        </select>
+      </div>
+
       <style>
         {`
           tr:hover {
@@ -81,34 +99,38 @@ const LeaderboardPage = () => {
         `}
       </style>
 
-      <table style={tableStyles}>
-        <thead style={theadStyles}>
-          <tr>
-            <th style={cellStyle}>#</th>
-            <th style={cellStyle}>Player</th>
-            <th style={cellStyle}>Fastest Time</th>
-            <th style={cellStyle}>Clicks</th>
-          </tr>
-        </thead>
-        <tbody>
-          {leaderboard.length > 0 ? (
-            leaderboard.map((entry, index) => (
-              <tr key={entry.id} style={{ backgroundColor: 'transparent' }}>
-                <td style={cellStyle}>{index + 1}</td>
-                <td style={cellStyle}>{entry.name}</td>
-                <td style={cellStyle}>{entry.time}</td>
-                <td style={cellStyle}>{entry.clicks}</td>
-              </tr>
-            ))
-          ) : (
+      {selectedChallenge && (
+        <table style={tableStyles}>
+          <thead style={theadStyles}>
             <tr>
-              <td style={cellStyle} colSpan="4">
-                No leaderboard data available. Be the first to set a record!
-              </td>
+              <th style={cellStyle}>#</th>
+              <th style={cellStyle}>Player</th>
+              <th style={cellStyle}>Time</th>
+              <th style={cellStyle}>Clicks</th>
+              <th style={cellStyle}>Date</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {leaderboard.length > 0 ? (
+              leaderboard.map((entry, index) => (
+                <tr key={index} style={{ backgroundColor: 'transparent' }}>
+                  <td style={cellStyle}>{index + 1}</td>
+                  <td style={cellStyle}>{entry.player_name || 'Anonymous'}</td>
+                  <td style={cellStyle}>{Math.floor(entry.time_ms / 1000)}s</td>
+                  <td style={cellStyle}>{entry.clicks}</td>
+                  <td style={cellStyle}>{new Date(entry.timestamp).toLocaleString()}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td style={cellStyle} colSpan="5">
+                  No leaderboard data available for this challenge.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

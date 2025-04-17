@@ -11,15 +11,6 @@ const STORAGE_KEYS = {
   startTime: 'wiki_startTime',
 }
 
-// fetch a random Wikipedia title
-const getRandomArticle = async () => {
-  const res = await fetch(
-    'https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnlimit=1&rnnamespace=0&origin=*'
-  )
-  const data = await res.json()
-  return (data.query?.random?.[0]?.title || 'United States of America').replace(/ /g, '_')
-}
-
 // format ms to MM:SS
 const formatTime = ms => {
   const m = Math.floor(ms / 60000)
@@ -45,20 +36,31 @@ const GamePage = () => {
   const [startTime, setStartTime] = useState(0)
   const [elapsed, setElapsed] = useState(0)
 
-  // initialize game
-  const initGame = async () => {
-    const [start, goal] = await Promise.all([getRandomArticle(), getRandomArticle()])
+  // new states for selecting challenge
+  const [challenges, setChallenges] = useState([])
+  const [selectedChallenge, setSelectedChallenge] = useState(null)
+
+  // fetch predefined challenges
+  useEffect(() => {
+    fetch('/api/get-precomputed-pairs')
+      .then(res => res.json())
+      .then(data => setChallenges(data))
+  }, [])
+
+  // initialize game from selected challenge
+  const initGameFromSelection = () => {
+    if (!selectedChallenge) return
     const now = Date.now()
-    setHistory([start])
+    setHistory([selectedChallenge.start])
     setCurrentIndex(0)
-    setGoalTitle(goal)
+    setGoalTitle(selectedChallenge.goal)
     setClicks(0)
     setStartTime(now)
     setElapsed(0)
     setAccumPaused(0)
-    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([start]))
+    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([selectedChallenge.start]))
     localStorage.setItem(STORAGE_KEYS.currentIndex, '0')
-    localStorage.setItem(STORAGE_KEYS.goalTitle, goal)
+    localStorage.setItem(STORAGE_KEYS.goalTitle, selectedChallenge.goal)
     localStorage.setItem(STORAGE_KEYS.clicks, '0')
     localStorage.setItem(STORAGE_KEYS.startTime, now.toString())
     setGameStarted(true)
@@ -152,19 +154,48 @@ const GamePage = () => {
     transition: 'transform 0.3s ease-in-out'
   }
 
+  // pre-game challenge selection UI
   if (!gameStarted) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <button onClick={initGame} style={{
-          ...commonBtn,
-          background: isDark ? '#2f855a' : '#48bb78'
-        }}>
-          Start Game
-        </button>
+        <h2 style={{ color: isDark ? '#f9fafb' : '#1e1e1e' }}>Choose a Challenge</h2>
+        {challenges.map((c, i) => (
+          <button
+            key={i}
+            onClick={() => setSelectedChallenge(c)}
+            style={{
+              ...commonBtn,
+              display: 'block',
+              margin: '0.5rem auto',
+              background: selectedChallenge?.start === c.start && selectedChallenge?.goal === c.goal ? '#4299e1' : (isDark ? '#2d3748' : '#cbd5e0')
+            }}
+          >
+            {c.start.replace(/_/g, ' ')} → {c.goal.replace(/_/g, ' ')} ({c.distance} clicks)
+          </button>
+        ))}
+        {selectedChallenge && (
+          <button onClick={initGameFromSelection} style={{
+            ...commonBtn,
+            marginTop: '1.5rem',
+            background: isDark ? '#2f855a' : '#48bb78',
+            animation: 'pulse 1.5s infinite',
+            cursor: 'pointer'
+          }}>
+            Start Game
+          </button>
+        )}
+        <style>{`
+          @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+          }
+        `}</style>
       </div>
     )
   }
 
+  // main game UI
   return (
     <div style={{ padding: '2rem', position: 'relative' }}>
       <h2 style={{ color: isDark ? '#f9fafb' : '#1e1e1e' }}>
@@ -219,7 +250,6 @@ const GamePage = () => {
       }}>
         Clicks: {clicks}
       </div>
-      {/* inline animation for pulse while in "Resume" state*/}
       <style>{`
         @keyframes pulse {
           0% { transform: scale(1); }
